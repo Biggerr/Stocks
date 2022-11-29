@@ -40,14 +40,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func debug() {
-        APICaller.shared.news(for: .compan(symbol: "MSFT")) { result in
-            switch result {
-            case .success(let news):
-                print(news.count)
-            case .failure: break
-            }
-            
-        }
+//        APICaller.shared.marketData(for: "AAPL", numberOfDays: 1) { result in
+//            switch result{
+//            case .success(let data):
+//                let candeSticks = data.candleSticks
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
 
 }
