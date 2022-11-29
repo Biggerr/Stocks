@@ -77,14 +77,18 @@ class WatchListViewController: UIViewController {
         var viewModels = [WatchListTableViewCell.ViewModel]()
         
         for (symbol, candleSticks) in watchlistMap {
-            let changePercentage = getChangePercentage(for: candleSticks)
+            let changePercentage = getChangePercentage(
+                symbol: symbol,
+                data: candleSticks
+            )
+            
             viewModels.append(
                 .init(
                       symbol: symbol,
                       companyName: UserDefaults.standard.string(forKey: symbol) ?? "Company",
                       price: getLatestClosingPrice(from: candleSticks),
                       changeColor: changePercentage < 0 ? .systemRed : .systemGreen,
-                      changePercentage: "\(changePercentage)"
+                      changePercentage: .percentage(from: changePercentage)
                      )
             )
         }
@@ -92,19 +96,19 @@ class WatchListViewController: UIViewController {
         self.viewModels = viewModels
     }
     
-    private func getChangePercentage(for data: [CandleStick]) -> Double {
+    private func getChangePercentage(symbol: String, data: [CandleStick]) -> Double {
 //        let today = Date()
-        let priorDate = Date().addingTimeInterval(-((3600 * 24) * 2))
+        let latestDate = data[0].date
         guard let latestClose = data.first?.close,
               let priorClose = data.first (where: {
-                Calendar.current.isDate($0.date, inSameDayAs: priorDate)
+                !Calendar.current.isDate($0.date, inSameDayAs: latestDate)
             })?.close else {
             return 0
             }
         
-        print("Current: \(latestClose) | Prior: \(priorClose)")
-        
-        return 0.0
+        let diff = 1 - (priorClose / latestClose)
+        print("\(symbol): \(diff)%")
+        return diff
     }
     
     private func getLatestClosingPrice(from data: [CandleStick]) -> String {
@@ -112,7 +116,7 @@ class WatchListViewController: UIViewController {
             return ""
         }
         
-        return "\(closingPrice)"
+        return .formatted(number: closingPrice)
     }
     
     private func setUpTableView() {
