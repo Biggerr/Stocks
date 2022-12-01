@@ -14,7 +14,7 @@ class StockDetailsViewController: UIViewController {
     
     private let symbol: String
     private let companyName: String
-    private let candleStickData: [CandleStick]
+    private var candleStickData: [CandleStick]
     
     private let tableView: UITableView = {
         let table = UITableView()
@@ -84,6 +84,18 @@ class StockDetailsViewController: UIViewController {
         // Fetch candle sticks if needed
         if candleStickData.isEmpty {
             group.enter()
+            APICaller.shared.marketData(for: symbol) { [weak self] result in
+                defer {
+                    group.leave()
+                }
+                
+                switch result {
+                case .success(let response):
+                    self?.candleStickData = response.candleSticks
+                case .failure(let error):
+                    print(error)
+                }
+            }
         }
         
         //Fetch financial metrics
@@ -138,9 +150,32 @@ class StockDetailsViewController: UIViewController {
         
         
         // Configure
-        headerView.configure(chartViewModel: .init(data: [], showLegend: false, showAxis: false), metricViewModels: viewModels)
+        let change = getChangePercentage(symbol: symbol, data: candleStickData)
+        headerView.configure(
+            chartViewModel: .init(data: candleStickData.reversed().map { $0.close },
+            showLegend: true,
+            showAxis: true,
+            fillColor: change < 0 ? .systemRed : .systemGreen
+                                  
+         ),
+            metricViewModels: viewModels
+        )
         tableView.tableHeaderView = headerView
     }
+    
+    private func getChangePercentage(symbol: String, data: [CandleStick]) -> Double {
+        let latestDate = data[0].date
+        guard let latestClose = data.first?.close,
+              let priorClose = data.first (where: {
+                !Calendar.current.isDate($0.date, inSameDayAs: latestDate)
+            })?.close else {
+            return 0
+            }
+        
+        let diff = 1 - (priorClose / latestClose)
+        return diff
+    }
+    
 }
 
 extension StockDetailsViewController: UITableViewDataSource, UITableViewDelegate {

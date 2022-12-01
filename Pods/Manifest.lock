@@ -1,22 +1,32 @@
 PODS:
+  - Charts (4.1.0):
+    - Charts/Core (= 4.1.0)
+  - Charts/Core (4.1.0):
+    - SwiftAlgorithms (~> 1.0)
   - FloatingPanel (2.5.5)
   - SDWebImage (5.13.2):
     - SDWebImage/Core (= 5.13.2)
   - SDWebImage/Core (5.13.2)
+  - SwiftAlgorithms (1.0.0)
 
 DEPENDENCIES:
+  - Charts
   - FloatingPanel
   - SDWebImage
 
 SPEC REPOS:
   trunk:
+    - Charts
     - FloatingPanel
     - SDWebImage
+    - SwiftAlgorithms
 
 SPEC CHECKSUMS:
+  Charts: 354f86803d11d9c35de280587fef50d1af063978
   FloatingPanel: a27e7827e0f710fa6236fe2596dd1b5484cb4fc1
   SDWebImage: 72f86271a6f3139cc7e4a89220946489d4b9a866
+  SwiftAlgorithms: 38dda4731d19027fdeee1125f973111bf3386b53
 
-PODFILE CHECKSUM: 33667bbe33dddae3fe4b472ec9fb39417b076316
+PODFILE CHECKSUM: e50c6d84baee710a3adf50b33b7bd2d7e43c0017
 
 COCOAPODS: 1.11.3
