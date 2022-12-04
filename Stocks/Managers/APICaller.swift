@@ -7,9 +7,12 @@
 
 import Foundation
 
+/// Object to manage api calls
 final class APICaller {
-    static let shared = APICaller()
+    /// Singleton
+    public static let shared = APICaller()
     
+    /// Constants
     private struct Constants {
         static let apiKey = "cdv03ciad3i2h5f4qlc0cdv03ciad3i2h5f4qlcg"
         static let sandboxApiKey = "cdv03ciad3i2h5f4qldg"
@@ -17,10 +20,15 @@ final class APICaller {
         static let day: TimeInterval = 3600 * 24
     }
     
+    /// Private constructor
     private init() {}
     
     // MARK: - Public
     
+    /// Search for a company
+    /// - Parameters:
+    ///   - query: Query string (symbol or name)
+    ///   - completion: Callback for result
     public func search(
         query: String,
         completion: @escaping (Result<SearchResponse, Error>) -> Void
@@ -34,6 +42,10 @@ final class APICaller {
         
     }
     
+    /// Get news for type
+    /// - Parameters:
+    ///   - type: Company or top stories
+    ///   - completion: Result callback
     public func news(
         for type: NewsViewController.`Type`,
         completion: @escaping (Result<[NewsStory], Error>) -> Void
@@ -57,8 +69,12 @@ final class APICaller {
         }
     }
     
+    /// Get market data
+    /// - Parameters:
+    ///   - symbol: Given symbol
+    ///   - numberOfDays: Number of days back from today
+    ///   - completion: Result callback
     public func marketData(
-    
         for symbol: String,
         numberOfDays: TimeInterval = 7,
         completion: @escaping (Result<MarketDataResponse, Error>) ->Void
@@ -77,6 +93,10 @@ final class APICaller {
         
     }
     
+    /// Get financial metrics
+    /// - Parameters:
+    ///   - symbol: Symbol of company
+    ///   - completion: Result callback
     public func financialMetrics(
         for symbol: String,
         completion: @escaping (Result<FinancialMetricsResponse, Error>) -> Void
@@ -90,6 +110,7 @@ final class APICaller {
     
     // MARK: - Private
     
+    /// API Endpoint
     private enum Endpoint: String {
         case search
         case topStories = "news"
@@ -98,11 +119,17 @@ final class APICaller {
         case financials = "stock/metric"
     }
     
+    /// API Errors
     private enum APIError: Error {
         case noDataReturned
         case invalidUrl
     }
     
+    /// Try to create url for endpoint
+    /// - Parameters:
+    ///   - endpoint: Endpoint to create for
+    ///   - queryParams: Additional query arguments
+    /// - Returns: Optional URL
     private func url(for endpoint: Endpoint, queryParams: [String: String] = [:]
     ) -> URL? {
         
@@ -118,15 +145,16 @@ final class APICaller {
         queryItems.append(.init(name: "token", value: Constants.apiKey))
         
         //Convert query items to suffix string
-        
         let queryString = queryItems.map { "\($0.name)=\($0.value ?? "")" }.joined(separator: "&")
-        
         urlString += "?" + queryString
-        
         return URL(string: urlString)
     }
     
-    
+    /// Perform apu call
+    /// - Parameters:
+    ///   - url: URL to hit
+    ///   - expecting: Type we expect to decode data to
+    ///   - complition: Result callback
     private func request<T: Codable>(url: URL?, expecting: T.Type, complition: @escaping (Result<T, Error>) -> Void){
         guard let url = url else {
             // Invalid url
